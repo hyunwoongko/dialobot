@@ -24,7 +24,7 @@
 <br><br>
 
 ## License
-Pecab project is licensed under the terms of the Apache License 2.0.
+Dialobot project is licensed under the terms of the Apache License 2.0.
 
 Copyright 2021 [Dialobot](https://github.com/dialobot). All Rights Reserved.
 
