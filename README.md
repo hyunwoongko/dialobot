@@ -19,7 +19,7 @@
 <br><br>
 
 ## Contributor
-[Hyunwoong Ko](https://github.com/hyunwoongko), Sunghyun Kim, Youngyun Na, Sangji Lee, Sooyoung Yang, [Yoonjae Lee](https://github.com/gityunjae) and Hwansuk Jung
+[Hyunwoong Ko](https://github.com/hyunwoongko), Sunghyun Kim, [Youngyun Na](https://github.com/fightnyy), Sangji Lee, Sooyoung Yang, [Yoonjae Lee](https://github.com/gityunjae) and Hwansuk Jung
 
 <br><br>
 
