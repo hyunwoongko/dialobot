@@ -8,7 +8,7 @@
 ```
 @misc{dialobot,
   author       = {Ko, Hyunwoong and Kim, Sunghyun and Na, Youngyun and 
-                  Lee, Sangji and Yang, Sooyoung and Lee, Yunjae and 
+                  Lee, Sangji and Yang, Sooyoung and Lee, Yoonjae and 
                   Jung, Hwansuk},
   title        = {Dialobot: Opensource Multilingual Chatbot Framework},
   howpublished = {\url{https://github.com/dialobot/dialobot}},
@@ -19,7 +19,7 @@
 <br><br>
 
 ## Contributor
-[Hyunwoong Ko](https://github.com/hyunwoongko), Sunghyun Kim, Youngyun Na, Sangji Lee, Sooyoung Yang, Yunjae Lee and Hwansuk Jung
+[Hyunwoong Ko](https://github.com/hyunwoongko), Sunghyun Kim, Youngyun Na, Sangji Lee, Sooyoung Yang, [Yoonjae Lee](https://github.com/gityunjae) and Hwansuk Jung
 
 <br><br>
 
