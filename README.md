@@ -9,7 +9,7 @@
 ## Citation
 ```
 @misc{dialobot,
-  author       = {Ko, Hyunwoong and Kim, Sunghyun and Na, Youngyun and Lee, Sangji and 
+  author       = {Ko, Hyunwoong and Kim, Seonghyun and Na, Youngyun and Lee, Sangji and 
                   Yang, Sooyoung and Lee, Yoonjae and Jung, Hwansuk},
   title        = {Dialobot: Opensource Multilingual Chatbot Framework},
   howpublished = {\url{https://github.com/dialobot/dialobot}},
