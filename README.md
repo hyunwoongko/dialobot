@@ -1,4 +1,6 @@
 # Dialobot: Opensource Multilingual Chatbot Framework
+[![PyPI version](https://badge.fury.io/py/dialobot.svg)](https://badge.fury.io/py/dialobot)
+![GitHub](https://img.shields.io/github/license/dialobot/dialobot)
 
 ... Work in process ...
 
