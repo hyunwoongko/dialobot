@@ -20,7 +20,7 @@
 <br>
 
 ## Contributor
-[Hyunwoong Ko](https://github.com/hyunwoongko), Sunghyun Kim, [Youngyun Na](https://github.com/fightnyy), [Sangji Lee](https://github.com/sangdee), Sooyoung Yang, [Yoonjae Lee](https://github.com/gityunjae) and [Hwanseok Jeong](https://github.com/jayden5744)
+[Hyunwoong Ko](https://github.com/hyunwoongko), [Seonghyun Kim](https://github.com/MrBananaHuman), [Youngyun Na](https://github.com/fightnyy), [Sangji Lee](https://github.com/sangdee), [Sooyoung Yang](https://github.com/aiaaua), [Yoonjae Lee](https://github.com/gityunjae) and [Hwanseok Jeong](https://github.com/jayden5744)
 
 <br>
 
