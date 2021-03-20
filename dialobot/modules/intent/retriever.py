@@ -70,6 +70,7 @@ class IntentRetriever(IntentBase):
             {'intent': 'weather', distances: [0.988, 0.693, ...]}
             >>> # 5. clear all dataset
             >>> retriever.clear()
+
         """
 
         self.model = SentenceTransformer(model)
@@ -106,6 +107,7 @@ class IntentRetriever(IntentBase):
 
         Raises:
             Raises Exceptoin when you try to add existed data.
+
         """
 
         for d in self.dataset:
@@ -232,6 +234,7 @@ class IntentRetriever(IntentBase):
             >>> retriever = IntentRetriever()
             >>> retriever.ntotal()
             20
+
         """
 
         return self.index.ntotal
@@ -247,6 +250,7 @@ class IntentRetriever(IntentBase):
             >>> retriever = IntentRetriever()
             >>> len(retriever)
             20
+            
         """
         return self.ntotal()
 
