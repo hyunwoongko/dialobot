@@ -73,7 +73,7 @@ class IntentRetriever(IntentBase):
         """
 
         self.model = SentenceTransformer(model)
-        self.index = faiss.IndexFlatL2(dim)
+        self.index = faiss.IndexFlatIP(dim)
         self.dim = dim
         self.idx_path = idx_path
         self.idx_file = idx_file
@@ -139,7 +139,7 @@ class IntentRetriever(IntentBase):
         find = False
         new_dataset = []
         new_vectors = []
-        new_index = faiss.IndexFlatL2(self.dim)
+        new_index = faiss.IndexFlatIP(self.dim)
 
         for d in self.dataset:
             if d[0] != data[0] or d[2] != data[1]:
@@ -264,4 +264,7 @@ class IntentRetriever(IntentBase):
 
         vector = self.model.encode(text)
         vector = np.array(vector, dtype=np.float32)
-        return vector.reshape(1, -1)
+        vector = vector.reshape(1, -1)
+        faiss.normalize_L2(vector)
+
+        return vector
