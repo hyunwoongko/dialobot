@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
-from typing import Union, Dict
+from typing import Union, Dict, Any
 
 
 class IntentBase(ABC):
@@ -23,6 +23,6 @@ class IntentBase(ABC):
         self,
         text: str,
         detail: bool = False,
-    ) -> Union[str, Dict[str, Union[str, float, int]]]:
+    ) -> Union[str, Dict[str, Any]]:
 
         raise NotImplementedError
