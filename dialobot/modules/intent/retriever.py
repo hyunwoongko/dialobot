@@ -213,6 +213,7 @@ class IntentRetriever(IntentBase):
             ">>> retriever = IntentRetriver()\n" \
             ">>> retriever.add((sentence, intent))"
 
+        voting = voting.lower()
         assert voting in ['soft', 'hard'], \
             "param `voting` must be one of ['soft', 'hard']."
 
