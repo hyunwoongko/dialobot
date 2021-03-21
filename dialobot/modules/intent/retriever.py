@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Union, Dict, List, Tuple
+from typing import Union, Dict, List, Tuple, Any
 from sentence_transformers import SentenceTransformer
 from dialobot.modules.base import IntentBase
 
@@ -37,6 +37,7 @@ class IntentRetriever(IntentBase):
         dim: int = 512,
         idx_path: str = f"{os.path.expanduser('~')}/.dialobot/intent/",
         idx_file: str = "intent.idx",
+        fallback_threshold: float = 0.7,
     ) -> None:
         """
         IntentRetriever using USE and faiss.
@@ -47,6 +48,7 @@ class IntentRetriever(IntentBase):
             dim (int): dimension of vector.
             idx_path (str): path to save dataset
             idx_file (str): file name of dataset
+            fallback_threshold (float): thershold for fallback checking
 
         References:
             Universal Sentence Encoder (Cer et al., 2018)
@@ -56,19 +58,20 @@ class IntentRetriever(IntentBase):
             https://arxiv.org/abs/1702.08734
 
         Examples:
-            >>> # 1. create retriever and append dataset
+            >>> # 1. create retriever
             >>> retriever = IntentRetriever()
+            >>> # 2. add data
             >>> retriever.add(("What time is it now?", "time"))
             >>> retriever.add(("Tell me today's weather", "weather"))
-            >>> # 2. remove dataset
+            >>> # 3. remove data
             >>> retriever.remove(("What time is it now?", "time"))
-            >>> # 3. recognize intent by retrieval
+            >>> # 4. recognize intent
             >>> retriever.recognize("Tell me tomorrow's weather")
             'weather'
-            >>> # 4. set `True` param `detail` if you want more information
+            >>> # 5. set `True` param `detail` if you want more information
             >>> retriever.recognize("Tell me tomorrow's weather", detail=True)
             {'intent': 'weather', distances: [(0.988, weather), (0.693, greeting), ...]}
-            >>> # 5. clear all dataset
+            >>> # 6. clear all dataset
             >>> retriever.clear()
 
         """
@@ -78,6 +81,7 @@ class IntentRetriever(IntentBase):
         self.dim = dim
         self.idx_path = idx_path
         self.idx_file = idx_file
+        self.fallback_threshold = fallback_threshold
 
         if os.path.exists(idx_path + idx_file):
             with open(idx_path + idx_file, mode="rb") as f:
@@ -106,7 +110,7 @@ class IntentRetriever(IntentBase):
             >>> retriever.add(("Tell me today's weather", "weather"))
 
         Raises:
-            Raises Exceptoin when you try to add existed data.
+            Raises exceptoin when you try to add existed data.
 
         """
 
@@ -134,7 +138,7 @@ class IntentRetriever(IntentBase):
             >>> retriever.remove(("What time is it now?", "time"))
 
         Raises:
-            Raises Exceptoin when you try to remove non-existed data.
+            Raises exceptoin when you try to remove non-existed data.
 
         """
 
@@ -184,12 +188,12 @@ class IntentRetriever(IntentBase):
         detail: bool = False,
         topk: int = 5,
         voting: str = "soft",
-    ) -> Union[str, Dict[str, Union[str, float, int]]]:
+    ) -> Union[str, Dict[str, Union[str, List[Tuple[float, str]]]]]:
         """
-        Recognize intent by data.
+        Recognize intent by input sentence.
 
         Args:
-            text (str): target string
+            text (str): input sentence
             detail (bool): whether to return details or not
             topk (int): number of distances to return
             voting (str): voting method for kNN search.
@@ -197,7 +201,7 @@ class IntentRetriever(IntentBase):
 
         Returns:
             (str): intent of input sentence (detail=False)
-            (Dict[str, Union[str, float]]): intent and distances (detail=True)
+            (Dict[str, Union[str, List[Tuple[float, str]]]]): intent and distances (detail=True)
 
         Examples:
             >>> retriever = IntentRetriever()
@@ -220,9 +224,14 @@ class IntentRetriever(IntentBase):
         topk = min(topk, self.index.ntotal)
         vector = self._vectorize(text)
         dists, indices = self.index.search(vector, topk)
-        scores: Dict[str, float] = {}
+        dists, indices = dists[0], indices[0]
+        is_fallback = False
 
-        for idx, d in zip(indices[0], dists[0]):
+        if max(dists) < self.fallback_threshold:
+            is_fallback = True
+
+        scores: Dict[str, float] = {}
+        for idx, d in zip(indices, dists):
             intent = self.dataset[idx][2]
             if intent not in scores:
                 scores[intent] = 0.0
@@ -233,13 +242,17 @@ class IntentRetriever(IntentBase):
 
         scores: Dict[float, str] = {v: k for k, v in scores.items()}
         intent = scores[sorted(scores, reverse=True)[0]]
+        intent = 'fallback' if is_fallback else intent
 
         if not detail:
             return intent
 
         return {
-            "inetnt": intent,
-            "distances": [(d, self.dataset[i][2]) for i, d in zip(indices[0], dists[0])],
+            "inetnt":
+                intent,
+            "distances": [
+                (d, self.dataset[i][2]) for i, d in zip(indices, dists)
+            ],
         }
 
     def ntotal(self) -> int:
@@ -275,13 +288,13 @@ class IntentRetriever(IntentBase):
 
     def _vectorize(self, text: str) -> np.ndarray:
         """
-        Create vector from text.
+        Create vector from input sentence.
 
         Args:
-            text (str): target string
+            text (str): input sentence
 
         Returns:
-            (np.ndarray): vector from text
+            (np.ndarray): vector from input sentence
 
         """
 
@@ -291,3 +304,4 @@ class IntentRetriever(IntentBase):
         faiss.normalize_L2(vector)
 
         return vector
+
