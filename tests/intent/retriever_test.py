@@ -48,9 +48,20 @@ class RetrieverTest(unittest.TestCase):
         self.assertTrue(cls == "restaurant")
         retriever.clear()
 
+    def test_fallback(self):
+        retriever = IntentRetriever()
+        retriever.clear()
+        retriever.add(("Tell me today's weather", "weather"))
+        retriever.add(("Tell me good restaurant.", "restaurant"))
+
+        cls = retriever.recognize("hello. my name is Kevin.")
+        self.assertTrue(cls == "fallback")
+        retriever.clear()
+
 
 if __name__ == '__main__':
     testcase = RetrieverTest()
     testcase.test_add()
     testcase.test_remove()
     testcase.test_search()
+    testcase.test_fallback()
