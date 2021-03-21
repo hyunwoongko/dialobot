@@ -208,14 +208,14 @@ class IntentRetriever(IntentBase):
 
         """
 
+        voting = voting.lower()
+        assert voting in ['soft', 'hard'], \
+            "param `voting` must be one of ['soft', 'hard']."
+
         assert self.index.ntotal != 0, \
             "empty index. please add new data using below codes.\n" \
             ">>> retriever = IntentRetriver()\n" \
             ">>> retriever.add((sentence, intent))"
-
-        voting = voting.lower()
-        assert voting in ['soft', 'hard'], \
-            "param `voting` must be one of ['soft', 'hard']."
 
         topk = min(topk, self.index.ntotal)
         vector = self._vectorize(text)
