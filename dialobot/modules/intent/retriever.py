@@ -67,7 +67,7 @@ class IntentRetriever(IntentBase):
             'weather'
             >>> # 4. set `True` param `detail` if you want more information
             >>> retriever.recognize("Tell me tomorrow's weather", detail=True)
-            {'intent': 'weather', distances: [0.988, 0.693, ...]}
+            {'intent': 'weather', distances: [(0.988, weather), (0.693, greeting), ...]}
             >>> # 5. clear all dataset
             >>> retriever.clear()
 
@@ -183,6 +183,7 @@ class IntentRetriever(IntentBase):
         text: str,
         detail: bool = False,
         topk: int = 5,
+        voting: str = "soft",
     ) -> Union[str, Dict[str, Union[str, float, int]]]:
         """
         Recognize intent by data.
@@ -191,6 +192,8 @@ class IntentRetriever(IntentBase):
             text (str): target string
             detail (bool): whether to return details or not
             topk (int): number of distances to return
+            voting (str): voting method for kNN search.
+                must be one of ['soft', 'hard'].
 
         Returns:
             (str): intent of input sentence (detail=False)
@@ -201,7 +204,7 @@ class IntentRetriever(IntentBase):
             >>> retriever.recognize("Tell me tomorrow's weather")
             'weather'
             >>> retriever.recognize("Tell me tomorrow's weather", detail=True)
-            {'intent': 'weather', distances: [0.988, 0.693, ...]}
+            {'intent': 'weather', distances: [(0.988, weather), (0.693, greeting), ...]}
 
         """
 
@@ -210,17 +213,32 @@ class IntentRetriever(IntentBase):
             ">>> retriever = IntentRetriver()\n" \
             ">>> retriever.add((sentence, intent))"
 
+        assert voting in ['soft', 'hard'], \
+            "param `voting` must be one of ['soft', 'hard']."
+
         topk = min(topk, self.index.ntotal)
         vector = self._vectorize(text)
         dists, indices = self.index.search(vector, topk)
-        intent = self.dataset[int(indices[0][0])][2]
+        scores: Dict[str, float] = {}
+
+        for idx, d in zip(indices[0], dists[0]):
+            intent = self.dataset[idx][2]
+            if intent not in scores:
+                scores[intent] = 0.0
+            if voting == "soft":
+                scores[intent] += d
+            else:
+                scores[intent] += 1
+
+        scores: Dict[float, str] = {v: k for k, v in scores.items()}
+        intent = scores[sorted(scores, reverse=True)[0]]
 
         if not detail:
             return intent
 
         return {
             "inetnt": intent,
-            "distances": dists[0].tolist(),
+            "distances": [(d, self.dataset[i][2]) for i, d in zip(indices[0], dists[0])],
         }
 
     def ntotal(self) -> int:
@@ -250,7 +268,7 @@ class IntentRetriever(IntentBase):
             >>> retriever = IntentRetriever()
             >>> len(retriever)
             20
-            
+
         """
         return self.ntotal()
 
