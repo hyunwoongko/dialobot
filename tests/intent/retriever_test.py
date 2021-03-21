@@ -16,7 +16,7 @@ import unittest
 from dialobot.modules.intent import IntentRetriever
 
 
-class TestRetriever(unittest.TestCase):
+class RetrieverTest(unittest.TestCase):
 
     def test_add(self):
         retriever = IntentRetriever()
@@ -50,7 +50,7 @@ class TestRetriever(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    testcase = TestRetriever()
+    testcase = RetrieverTest()
     testcase.test_add()
     testcase.test_remove()
     testcase.test_search()
