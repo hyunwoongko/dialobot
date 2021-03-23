@@ -17,9 +17,8 @@ import contextlib
 import torch
 
 from typing import Union, Dict, Any, List
-from dialobot.modules.base import IntentBase
-from dialobot.modules.utils.const import LANGUAGE_ALIAS
-from dialobot.modules.utils.tokenizer import BrainBertTokenizer
+from dialobot.core.base import IntentBase
+from dialobot.core.utils import LANGUAGE_ALIAS, BrainBertTokenizer
 from transformers import (
     RobertaForSequenceClassification,
     RobertaTokenizer,

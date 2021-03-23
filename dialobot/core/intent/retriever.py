@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Union, Dict, List, Tuple, Any
+from typing import Union, Dict, List, Tuple
 from sentence_transformers import SentenceTransformer
-from dialobot.modules.base import IntentBase
+from dialobot.core.base import IntentBase
 
 import os
 import numpy as np
