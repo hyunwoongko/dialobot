@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dialobot.modules.intent.classifier import IntentClassifier
 from dialobot.modules.intent.retriever import IntentRetriever
 
-__all__ = [IntentRetriever]
+__all__ = [IntentRetriever, IntentClassifier]
