@@ -57,11 +57,3 @@ class RetrieverTest(unittest.TestCase):
         cls = retriever.recognize("hello. my name is Kevin.")
         self.assertTrue(cls == "fallback")
         retriever.clear()
-
-
-if __name__ == '__main__':
-    testcase = RetrieverTest()
-    testcase.test_add()
-    testcase.test_remove()
-    testcase.test_search()
-    testcase.test_fallback()
