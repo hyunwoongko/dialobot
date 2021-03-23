@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dialobot.modules.intent.classifier import IntentClassifier
-from dialobot.modules.intent.retriever import IntentRetriever
+from dialobot.core.utils.tokenizer import BrainBertTokenizer
+from dialobot.core.utils.const import LANGUAGE_ALIAS
 
-__all__ = [IntentRetriever, IntentClassifier]
+__all__ = [BrainBertTokenizer, LANGUAGE_ALIAS]

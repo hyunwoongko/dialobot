@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import unittest
-from dialobot.modules.intent import IntentRetriever
+from dialobot.core.intent import IntentRetriever
 
 
 class RetrieverTest(unittest.TestCase):
