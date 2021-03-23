@@ -37,10 +37,11 @@ class IntentClassifier(IntentBase):
             lang (str): language
         """
 
-        if lang not in self.available_languages():
-            lang = LANGUAGE_ALIAS[lang.lower()]
+        lang = lang.lower()
 
-        self.lang = lang
+        if lang not in self.available_languages():
+            lang = LANGUAGE_ALIAS[lang]
+
         assert lang in self.available_languages(), \
             "currently we support only English, Korean, Japanese, Chinese.\n" \
             " So, param `lang` must be one of ['en', 'ko', 'ja', 'zh']"
@@ -94,6 +95,7 @@ class IntentClassifier(IntentBase):
         else:
             raise Exception(f"wrong language: {lang}")
 
+        self.lang = lang
         self.model = RobertaForSequenceClassification.from_pretrained(
             self.model_name)
 
