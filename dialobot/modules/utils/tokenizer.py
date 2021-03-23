@@ -83,7 +83,7 @@ class BrainBertTokenizer(BaseTokenizer):
         self,
         text: str,
         return_tensors: bool = True,
-        add_special_tokens: bool = "pt",
+        add_special_tokens: str = "pt",
     ) -> Union[List[int], torch.Tensor]:
         """
         encode text for brainbert.
