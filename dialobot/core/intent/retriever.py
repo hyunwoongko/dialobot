@@ -117,12 +117,13 @@ class IntentRetriever(IntentBase):
         if os.path.exists(idx_path + idx_file):
             self.index = faiss.read_index(idx_path + idx_file)
 
-    def add(self, data: Tuple[str, str]) -> None:
+    def add(self, data: Tuple[str, str], exist_ok=True) -> None:
         """
         Add data to dataset.
 
         Args:
             data (Tuple[str, str]): tuple of (sentence, intent)
+            exist_ok (bool): ignore exception when you inputted duplicates data
 
         Examples:
             >>> retriever = IntentRetriever()
@@ -135,7 +136,10 @@ class IntentRetriever(IntentBase):
 
         for d in self.dataset:
             if data[0] == d[0] and data[1] == d[2]:
-                raise Exception(f"This data is already existed: {data}")
+                if exist_ok:
+                    return
+                else:
+                    raise Exception(f"This data is already existed: {data}")
 
         vector = self._vectorize(data[0])
         data = (data[0], vector, data[1])
