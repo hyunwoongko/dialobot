@@ -24,7 +24,7 @@ class ClassifierTester(unittest.TestCase):
         self.assertTrue(out == "날씨")
 
     def test_english(self):
-        clf = IntentClassifier(lang="ko")
+        clf = IntentClassifier(lang="en")
         out = clf.recognize("Tell me today's weather",
                             intents=["weather", "restaurant"])
         self.assertTrue(out == "weather")
