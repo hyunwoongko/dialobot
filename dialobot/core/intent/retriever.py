@@ -38,12 +38,12 @@ class IntentRetriever(IntentBase):
         idx_path: str = os.path.join(
             os.path.expanduser('~'),
             ".dialobot",
-            "intent",
+            "intent/",
         ),
         idx_file: str = "intent.idx",
         dataset_file: str = "dataset.pkl",
         fallback_threshold: float = 0.7,
-        nlist: int = 100,
+        topk: int = 5,
     ) -> None:
         """
         IntentRetriever using USE and faiss.
@@ -55,6 +55,7 @@ class IntentRetriever(IntentBase):
             idx_path (str): path to save dataset
             idx_file (str): file name of dataset
             fallback_threshold (float): thershold for fallback checking
+            topk (int): number of distances to return
 
         References:
             Universal Sentence Encoder (Cer et al., 2018)
@@ -81,30 +82,27 @@ class IntentRetriever(IntentBase):
             >>> retriever.clear()
         """
 
-        # todo : nlist, nprobe 기본값 설정
-        # nprobe : the number of cells (out of nlist) that are visited to perform a search
-        # nlist : the number of cells
-        # nlist =100으로 잡고 문장을 추가하면 다음과 같은 에러발생
-        # Error: 'nx >= k' failed: Number of training points (1) should be at least as large as number of clusters (100)
-        # Solution 1 : nlist 크기만큼 데이터셋을 한번에 학습을 해야함 => default dataset이 필요
-        # Solution 2 : 데이터가 100개 이하일 때는 문장이 추가될때마다 문장 개수와 동일한 nlist를 가진 index를 새로 생성,
-        #              100개 이후에는 기존의 index에 추가 데이터를 그대로 학습
-
+        self.dim = dim
+        self.topk = topk
         self.model = SentenceTransformer(model)
         self.quantizer = faiss.IndexFlatIP(dim)
-        self.index = faiss.IndexIVFFlat(
-            self.quantizer,
-            dim,
-            nlist,
-            faiss.METRIC_INNER_PRODUCT,
-        )
 
-        self.dim = dim
-        self.nlist = nlist
         self.idx_path = idx_path
         self.idx_file = idx_file
         self.dataset_file = dataset_file
         self.fallback_threshold = fallback_threshold
+
+        if os.path.exists(idx_path + idx_file):
+            self.index = faiss.read_index(idx_path + idx_file)
+            self.nlist = int(self.index.ntotal / self.topk)
+        else:
+            self.nlist = 1
+            self.index = faiss.IndexIVFFlat(
+                self.quantizer,
+                dim,
+                self.nlist,
+                faiss.METRIC_INNER_PRODUCT,
+            )
 
         if os.path.exists(idx_path + dataset_file):
             with open(idx_path + dataset_file, mode="rb") as f:
@@ -113,9 +111,6 @@ class IntentRetriever(IntentBase):
             os.makedirs(idx_path, exist_ok=True)
             self.dataset: List[Tuple[str, np.ndarray, str]] = []
             # list of (sentence, vector, intent)
-
-        if os.path.exists(idx_path + idx_file):
-            self.index = faiss.read_index(idx_path + idx_file)
 
     def add(self, data: Tuple[str, str], exist_ok=True) -> None:
         """
@@ -133,7 +128,6 @@ class IntentRetriever(IntentBase):
         Raises:
             Raises exceptoin when you try to add existed data.
         """
-
         for d in self.dataset:
             if data[0] == d[0] and data[1] == d[2]:
                 if exist_ok:
@@ -143,10 +137,29 @@ class IntentRetriever(IntentBase):
 
         vector = self._vectorize(data[0])
         data = (data[0], vector, data[1])
-        self.index.train(vector)
-        assert self.index.is_trained
 
-        self.index.add(vector)
+        vectors = np.array(vector)
+        for _, vec, _ in self.dataset:
+            vectors = np.append(vectors, vec, axis=0)
+
+        if len(vector) >= 20:
+            self.nlist = int(len(vector) / self.topk)
+            self.index = faiss.IndexIVFFlat(
+                self.quantizer,
+                self.dim,
+                self.nlist,
+                faiss.METRIC_INNER_PRODUCT,
+            )
+            self.index.train(vectors)
+            assert self.index.is_trained
+
+            self.index.add(vectors)
+
+        else:
+            self.index.train(vectors)
+            assert self.index.is_trained
+
+            self.index.add(vector)
         self.dataset.append(data)
 
         with open(self.idx_path + self.dataset_file, mode="wb") as f:
@@ -172,6 +185,10 @@ class IntentRetriever(IntentBase):
         find = False
         new_dataset = []
         new_vectors = []
+        if self.ntotal() > 20:
+            self.nlist = int(len(self.dataset) / self.topk)
+        else:
+            self.nlist = 1
         new_index = faiss.IndexIVFFlat(self.quantizer, self.dim, self.nlist,
                                        faiss.METRIC_INNER_PRODUCT)
 
@@ -207,7 +224,9 @@ class IntentRetriever(IntentBase):
         """
 
         self.dataset = []
-        self.index.reset()
+        self.nlist = 1
+        self.index = faiss.IndexIVFFlat(self.quantizer, self.dim, self.nlist,
+                                        faiss.METRIC_INNER_PRODUCT)
 
         with open(self.idx_path + self.dataset_file, mode="wb") as f:
             pickle.dump(self.dataset, f, pickle.HIGHEST_PROTOCOL)
@@ -218,7 +237,6 @@ class IntentRetriever(IntentBase):
         self,
         text: str,
         detail: bool = False,
-        topk: int = 5,
         voting: str = "soft",
     ) -> Union[str, Dict[str, Union[str, List[Tuple[float, str]]]]]:
         """
@@ -227,7 +245,6 @@ class IntentRetriever(IntentBase):
         Args:
             text (str): input sentence
             detail (bool): whether to return details or not
-            topk (int): number of distances to return
             voting (str): voting method for kNN search.
                 must be one of ['soft', 'hard'].
 
@@ -252,7 +269,7 @@ class IntentRetriever(IntentBase):
             ">>> retriever = IntentRetriver()\n" \
             ">>> retriever.add((sentence, intent))"
 
-        topk = min(topk, self.index.ntotal)
+        topk = min(self.topk, self.index.ntotal)
         vector = self._vectorize(text)
         dists, indices = self.index.search(vector, topk)
         dists, indices = dists[0], indices[0]
