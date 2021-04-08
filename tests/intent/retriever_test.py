@@ -23,8 +23,7 @@ class RetrieverTest(unittest.TestCase):
         retriever.clear()
         retriever.add(("Tell me tomorrow's weather", "weather"))
         retriever.add(("Tell me today's weather", "weather"))
-        retriever.add(("Tell me good restaurant.", "restaurant"))
-        retriever.add(("I'm hungry. Tell me restaurants", "restaurant"))
+        retriever.add([("Tell me good restaurant.", "restaurant"), ("I'm hungry. Tell me restaurants", "restaurant")])
 
         self.assertTrue(len(retriever) == 4)
         retriever.clear()
