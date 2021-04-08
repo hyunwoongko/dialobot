@@ -29,7 +29,11 @@ from transformers import (
 
 class IntentClassifier(IntentBase):
 
-    def __init__(self, lang: str) -> None:
+    def __init__(
+            self,
+            lang: str,
+            fallback_threshold: float = 0.7,
+    ) -> None:
         """
         Zero-shot intent classifier using RoBERTa models.
 
@@ -98,6 +102,7 @@ class IntentClassifier(IntentBase):
         self.lang = lang
         self.model = RobertaForSequenceClassification.from_pretrained(
             self.model_name)
+        self.fallback_threshold = fallback_threshold
 
     @staticmethod
     def available_languages():
@@ -136,12 +141,13 @@ class IntentClassifier(IntentBase):
 
         f = lambda i: results[i]
         argmax = max(range(len(results)), key=f)
+        intent = 'fallback' if results[argmax].item() < self.fallback_threshold else intents[argmax]
 
         if not detail:
-            return intents[argmax]
+            return intent
 
         return {
-            "intent": intents[argmax],
+            "intent": intent,
             "logits": {k: round(v.item(), 5) for k, v in zip(intents, results)}
         }
 
