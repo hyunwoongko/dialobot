@@ -32,18 +32,18 @@ except ImportError as e:
 class IntentRetriever(IntentBase):
 
     def __init__(
-        self,
-        model: str = "distiluse-base-multilingual-cased-v2",
-        dim: int = 512,
-        idx_path: str = os.path.join(
-            os.path.expanduser('~'),
-            ".dialobot",
-            "intent/",
-        ),
-        idx_file: str = "intent.idx",
-        dataset_file: str = "dataset.pkl",
-        fallback_threshold: float = 0.7,
-        topk: int = 5,
+            self,
+            model: str = "distiluse-base-multilingual-cased-v2",
+            dim: int = 512,
+            idx_path: str = os.path.join(
+                os.path.expanduser('~'),
+                ".dialobot",
+                "intent/",
+            ),
+            idx_file: str = "intent.idx",
+            dataset_file: str = "dataset.pkl",
+            fallback_threshold: float = 0.7,
+            topk: int = 5,
     ) -> None:
         """
         IntentRetriever using USE and faiss.
@@ -270,10 +270,10 @@ class IntentRetriever(IntentBase):
         faiss.write_index(self.index, self.idx_path + self.idx_file)
 
     def recognize(
-        self,
-        text: str,
-        detail: bool = False,
-        voting: str = "soft",
+            self,
+            text: str,
+            detail: bool = False,
+            voting: str = "soft",
     ) -> Union[str, Dict[str, Union[str, List[Tuple[float, str]]]]]:
         """
         Recognize intent by input sentence.
@@ -353,6 +353,22 @@ class IntentRetriever(IntentBase):
         """
 
         return self.index.ntotal
+
+    def intents(self) -> List[str]:
+        """
+        Return information from trained intents
+
+        Returns:
+            (List[str]) : trained intents in dataset
+
+        Examples:
+            >>> retriever = IntentRetriever()
+            >>> retriever.add(("Tell me tomorrow's weather", "weather"))
+            >>> retriever.intents()
+            weather
+
+        """
+        return list(set([i[2] for i in self.dataset]))
 
     def __len__(self) -> int:
         """

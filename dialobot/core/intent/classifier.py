@@ -39,6 +39,7 @@ class IntentClassifier(IntentBase):
 
         Args:
             lang (str): language
+            fallback_threshold (float):
         """
 
         lang = lang.lower()
@@ -125,7 +126,16 @@ class IntentClassifier(IntentBase):
         intents: List[str],
         detail: bool = False,
     ) -> Union[str, Dict[str, Any]]:
+        """
 
+        Args:
+            text:
+            intents:
+            detail:
+
+        Returns:
+
+        """
         results = []
         for intent in intents:
             hypothesis = self.hypothesises(self.lang, intent)
