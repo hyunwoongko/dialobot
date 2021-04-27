@@ -21,12 +21,13 @@ from dialobot.core.intent.classifier import IntentClassifier
 from dialobot.core.intent.retriever import IntentRetriever
 
 
+# todo : 벤치마크 데이터셋으로 성능평가
 class Intent(IntentBase):
 
     def __init__(
             self,
-            model: str,
             lang: str,
+            model: str = 'both',
             device: str = "cuda",
             clf_fallback_threshold: float = 0.7,
             rtv_fallback_threshold: float = 0.7,
@@ -41,7 +42,6 @@ class Intent(IntentBase):
             dataset_file: str = "dataset.pkl",
             topk: int = 5,
     ):
-
         model = model.lower()
         if model not in self.availabel_models():
             model = MODEL_ALIAS[model]

@@ -44,6 +44,7 @@ class IntentRetriever(IntentBase):
             dataset_file: str = "dataset.pkl",
             fallback_threshold: float = 0.7,
             topk: int = 5,
+            labeling_count: int = 20,
     ) -> None:
         """
         IntentRetriever using USE and faiss.
@@ -56,6 +57,7 @@ class IntentRetriever(IntentBase):
             idx_file (str): file name of dataset
             fallback_threshold (float): thershold for fallback checking
             topk (int): number of distances to return
+            labeling_count (int) : Minimum Labeling Count
 
         References:
             Universal Sentence Encoder (Cer et al., 2018)
@@ -63,6 +65,12 @@ class IntentRetriever(IntentBase):
 
             Billion-scale similarity search with GPUs (Johnson et al., 2017)
             https://arxiv.org/abs/1702.08734
+
+        Note:
+            If the number of data is smaller than the labeling_count,
+            it is classified as 'the number of data',
+            and if it is more than that,
+            it is classified as 'int(the number of data / topk)' labels.
 
         Examples:
             >>> # 1. create retriever
@@ -85,6 +93,7 @@ class IntentRetriever(IntentBase):
 
         self.dim = dim
         self.topk = topk
+        self.labeling_count = labeling_count
         self.model = SentenceTransformer(model)
         self.quantizer = faiss.IndexFlatIP(dim)
 
@@ -171,7 +180,7 @@ class IntentRetriever(IntentBase):
         for _, vec, _ in self.dataset:
             vectors = np.append(vectors, vec, axis=0)
 
-        if len(vectors) >= 20:
+        if len(vectors) >= self.labeling_count:
             self.nlist = int(len(vectors) / self.topk)
             self.index = faiss.IndexIVFFlat(
                 self.quantizer,
@@ -221,7 +230,7 @@ class IntentRetriever(IntentBase):
         find = False
         new_dataset = []
         new_vectors = []
-        if self.ntotal() > 20:
+        if self.ntotal() > self.labeling_count:
             self.nlist = int(len(self.dataset) / self.topk)
         else:
             self.nlist = 1

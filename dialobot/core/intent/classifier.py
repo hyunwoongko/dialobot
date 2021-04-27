@@ -39,7 +39,7 @@ class IntentClassifier(IntentBase):
 
         Args:
             lang (str): language
-            fallback_threshold (float):
+            fallback_threshold (float): thershold for fallback checking
         """
 
         lang = lang.lower()
@@ -129,11 +129,13 @@ class IntentClassifier(IntentBase):
         """
 
         Args:
-            text:
-            intents:
-            detail:
+            text (str): input sentence
+            intents (List[str]): List of intents
+            detail (bool): whether to return details or not
 
         Returns:
+            (str): intent of input sentence (detail=False)
+            (Dict[str, Union[str, List[Tuple[float, str]]]]): intent and distances (detail=True)
 
         """
         results = []
