@@ -28,7 +28,7 @@ class Intent(IntentBase):
             self,
             lang: str,
             model: str = 'both',
-            device: str = "cuda",
+            device: str = "cuda",   # todo : gpu를 활용하는 곳에 device 선언
             clf_fallback_threshold: float = 0.7,
             rtv_fallback_threshold: float = 0.7,
             rtv_model: str = "distiluse-base-multilingual-cased-v2",
@@ -42,6 +42,40 @@ class Intent(IntentBase):
             dataset_file: str = "dataset.pkl",
             topk: int = 5,
     ):
+        """
+
+        Args:
+            lang (str): language
+            model (str): select model [classifier(clf), retriever(rtv), both]
+            device (str): choose 1 between cpu and gpu
+            clf_fallback_threshold (str): classifier threshold for fallback checking
+            rtv_fallback_threshold (str): retriever threshold for fallback checking
+            rtv_model (str): retriever model name for sentence transformers
+            rtv_dim (int): retriever dimension of vector
+            idx_path (str): path to save retriever dataset
+            idx_file (str): file name of trained faiss
+            dataset_file (str): file name of retriever dataset
+            topk (int): number of distances to return
+
+        Examples:
+            >>>> # 1. create classifier
+            >>>> intent = Intent(lang="en")
+            >>>> # 2. add retriever data and batch data
+            >>> intent.add(("They do really good food at that restaurant and it's not very expensive either.", "restaurant"))
+            >>> intent.add(("Tell me today's weather", "weather"))
+            >>> intent.add([("How will the weather be tomorrow?", "weather"),
+                ("A lot of new restaurants have started up in the region.", "restaurant")])
+            >>> # 3. remove data
+            >>> intent.remove(("Tell me today's weather", "weather"))
+            >>> # 4. recognize intent
+            >>> intent.recognize("Tell me today's weather", intents=["weather", "restaurant"])
+            'weather'
+            >>> intent.recognize("Tell me today's weather", intents=["weather", "restaurant"], detail=True)
+            {'intent': 'weather',
+            'classifier': {'weather': 0.75165, 'restaurant': 0.0004},
+            'retriever': [(0.99999976, 'weather'), (0.6623127, 'weather'), ...]}
+
+        """
         model = model.lower()
         if model not in self.availabel_models():
             model = MODEL_ALIAS[model]
@@ -127,19 +161,22 @@ class Intent(IntentBase):
             rtv_intents = self.rtv.intents()
             if intents is None:
                 clf_out = self.clf.recognize(text=text, intents=rtv_intents, detail=detail)
-                rtv_out = self.rtv.recognize(text=text, detail=detail, voting=voting)
+                rtv_out = self.rtv.recognize(text=text, voting=voting, detail=detail)
             else:
                 for input_intent in intents:
                     assert input_intent in rtv_intents, \
                         "`{}` is an intent that has not been trained in the retriever model.".format(input_intent)
                 clf_out = self.clf.recognize(text=text, intents=intents, detail=detail)
-                rtv_out = self.rtv.recognize(text=text, detail=detail, voting=voting)
-            intent = 'fallback' if clf_out['intent'] != rtv_out['intent'] else clf_out['intent']
-            if not detail:
+                rtv_out = self.rtv.recognize(text=text, voting=voting, detail=detail)
+            print(clf_out)
+            print(rtv_out)
+            if detail:
+                intent = 'fallback' if clf_out['intent'] != rtv_out['intent'] else clf_out['intent']
+                return {
+                    "intent": intent,
+                    "classifier": clf_out["logits"],
+                    "retriever": rtv_out["distances"],
+                }
+            else:
+                intent = 'fallback' if clf_out != rtv_out else clf_out
                 return intent
-
-            return {
-                "intent": intent,
-                "classifier": clf_out["logits"],
-                "retriever": rtv_out["distances"],
-            }

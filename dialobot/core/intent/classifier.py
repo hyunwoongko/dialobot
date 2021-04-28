@@ -39,7 +39,14 @@ class IntentClassifier(IntentBase):
 
         Args:
             lang (str): language
-            fallback_threshold (float): thershold for fallback checking
+            fallback_threshold (float): threshold for fallback checking
+
+        Examples:
+            >>> # 1. create classifier
+            >>> clf = IntentClassifier(lang="en")
+            >>> # 2. recognize intent
+            >>> clf.recognize("Tell me today's weather", intents=["weather", "restaurant"])
+            'weather'
         """
 
         lang = lang.lower()
@@ -121,10 +128,10 @@ class IntentClassifier(IntentBase):
         return templates[lang]
 
     def recognize(
-        self,
-        text: str,
-        intents: List[str],
-        detail: bool = False,
+            self,
+            text: str,
+            intents: List[str],
+            detail: bool = False,
     ) -> Union[str, Dict[str, Any]]:
         """
 
@@ -172,10 +179,10 @@ class IntentClassifier(IntentBase):
             return 2
 
     def download_brainbert_tokenizer(
-        self,
-        dir_path: str,
-        vocab_json: str,
-        merges_txt: str,
+            self,
+            dir_path: str,
+            vocab_json: str,
+            merges_txt: str,
     ) -> None:
 
         import requests

@@ -34,12 +34,14 @@ class PipelineTest(unittest.TestCase):
         self.assertTrue(out == "weather")
 
     def test_both(self):
-        intent = Intent(model="both", lang="ko")
+        intent = Intent(model="both", lang="en")
         intent.clear()
-        intent.add(("지금 몇시야?", "시간"))
-        intent.add(("오늘 날씨 알려줘", "날씨"))
-        out = intent.recognize("지금 몇시야?", intents=["날씨", "시간"])
-        self.assertTrue(out == "시간")
+        intent.add(("They do really good food at that restaurant and it's not very expensive either.", "restaurant"))
+        intent.add(("Tell me today's weather", "weather"))
+        intent.add([("How will the weather be tomorrow?", "weather"),
+                    ("A lot of new restaurants have started up in the region.", "restaurant")])
+        out = intent.recognize("Tell me today's weather", intents=["weather", "restaurant"])
+        self.assertTrue(out == "weather")
 
 
 

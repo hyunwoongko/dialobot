@@ -54,8 +54,9 @@ class IntentRetriever(IntentBase):
             model (str): model name for sentence transformers
             dim (int): dimension of vector.
             idx_path (str): path to save dataset
-            idx_file (str): file name of dataset
-            fallback_threshold (float): thershold for fallback checking
+            idx_file (str): file name of trained faiss
+            dataset_file (str): file name of dataset
+            fallback_threshold (float): threshold for fallback checking
             topk (int): number of distances to return
             labeling_count (int) : Minimum Labeling Count
 
@@ -75,7 +76,7 @@ class IntentRetriever(IntentBase):
         Examples:
             >>> # 1. create retriever
             >>> retriever = IntentRetriever()
-            >>> # 2. add data
+            >>> # 2. add data, batch data
             >>> retriever.add(("What time is it now?", "time"))
             >>> retriever.add(("Tell me today's weather", "weather"))
             >>> retriever.add([("What time do we meet tomorrow?", "time"),  ("How will the weather be tomorrow?", "weather")])
