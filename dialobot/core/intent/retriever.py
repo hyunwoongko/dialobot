@@ -373,7 +373,7 @@ class IntentRetriever(IntentBase):
         Examples:
             >>> retriever = IntentRetriever()
             >>> retriever.add(("Tell me tomorrow's weather", "weather"))
-            >>> retriever.intents()
+            >>> retriever.intent()
             weather
 
         """
