@@ -21,14 +21,13 @@ from dialobot.core.intent.classifier import IntentClassifier
 from dialobot.core.intent.retriever import IntentRetriever
 
 
-# todo : 벤치마크 데이터셋으로 성능평가
 class Intent(IntentBase):
 
     def __init__(
             self,
             lang: str,
             model: str = 'both',
-            device: str = "cuda",   # todo : gpu를 활용하는 곳에 device 선언
+            device: str = "cuda",
             clf_fallback_threshold: float = 0.7,
             rtv_fallback_threshold: float = 0.7,
             rtv_model: str = "distiluse-base-multilingual-cased-v2",
@@ -168,8 +167,6 @@ class Intent(IntentBase):
                         "`{}` is an intent that has not been trained in the retriever model.".format(input_intent)
                 clf_out = self.clf.recognize(text=text, intents=intents, detail=detail)
                 rtv_out = self.rtv.recognize(text=text, voting=voting, detail=detail)
-            print(clf_out)
-            print(rtv_out)
             if detail:
                 intent = 'fallback' if clf_out['intent'] != rtv_out['intent'] else clf_out['intent']
                 return {

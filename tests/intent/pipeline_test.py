@@ -42,6 +42,3 @@ class PipelineTest(unittest.TestCase):
                     ("A lot of new restaurants have started up in the region.", "restaurant")])
         out = intent.recognize("Tell me today's weather", intents=["weather", "restaurant"])
         self.assertTrue(out == "weather")
-
-
-
