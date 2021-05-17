@@ -10,7 +10,7 @@
 ## Citation
 ```
 @misc{dialobot,
-  author       = {Ko, Hyunwoong and Kim, Seonghyun and Na, Youngyun and Lee, Sangji and 
+  author       = {Ko, Hyunwoong and Kim, Seonghyun and Na, Youngyun and 
                   Yang, Sooyoung and Lee, Yoonjae and Jung, Hwansuk},
   title        = {Dialobot: Opensource Multilingual Chatbot Framework},
   howpublished = {\url{https://github.com/dialobot/dialobot}},
@@ -21,7 +21,7 @@
 <br>
 
 ## Contributor
-[Hyunwoong Ko](https://github.com/hyunwoongko), [Seonghyun Kim](https://github.com/MrBananaHuman), [Youngyun Na](https://github.com/fightnyy), [Sangji Lee](https://github.com/sangdee), [Sooyoung Yang](https://github.com/aiaaua), [Yoonjae Lee](https://github.com/gityunjae) and [Hwanseok Jeong](https://github.com/jayden5744)
+[Hyunwoong Ko](https://github.com/hyunwoongko), [Seonghyun Kim](https://github.com/MrBananaHuman), [Youngyun Na](https://github.com/fightnyy), [Sooyoung Yang](https://github.com/aiaaua), [Yoonjae Lee](https://github.com/gityunjae) and [Hwanseok Jeong](https://github.com/jayden5744)
 
 <br>
 
