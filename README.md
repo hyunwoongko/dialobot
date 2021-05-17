@@ -41,12 +41,12 @@ streamlit run dialobot.py
 }
 ```
 
-<br>
+<br><br><br>
 
 ## Contributor
 [Hyunwoong Ko](https://github.com/hyunwoongko), [Seonghyun Kim](https://github.com/MrBananaHuman), [Youngyun Na](https://github.com/fightnyy), [Sooyoung Yang](https://github.com/aiaaua), [Yoonjae Lee](https://github.com/gityunjae) and [Hwanseok Jeong](https://github.com/jayden5744)
 
-<br>
+<br><br><br>
 
 ## License
 Dialobot project is licensed under the terms of the Apache License 2.0.
