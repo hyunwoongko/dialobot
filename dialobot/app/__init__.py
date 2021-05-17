@@ -1,3 +1,3 @@
-from dialobot.app.frontend.home import App
+from dialobot.app.app import Application
 
-__all__ = [App]
+__all__ = [Application]
