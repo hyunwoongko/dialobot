@@ -22,3 +22,8 @@ LANGUAGE_ALIAS = {
     "chinese": "zh",
     "cn": "zh",
 }
+
+MODEL_ALIAS = {
+    "classifier": "clf",
+    "retriever": "rtv",
+}

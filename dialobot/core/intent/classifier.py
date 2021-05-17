@@ -29,12 +29,24 @@ from transformers import (
 
 class IntentClassifier(IntentBase):
 
-    def __init__(self, lang: str) -> None:
+    def __init__(
+            self,
+            lang: str,
+            fallback_threshold: float = 0.7,
+    ) -> None:
         """
         Zero-shot intent classifier using RoBERTa models.
 
         Args:
             lang (str): language
+            fallback_threshold (float): threshold for fallback checking
+
+        Examples:
+            >>> # 1. create classifier
+            >>> clf = IntentClassifier(lang="en")
+            >>> # 2. recognize intent
+            >>> clf.recognize("Tell me today's weather", intents=["weather", "restaurant"])
+            'weather'
         """
 
         lang = lang.lower()
@@ -98,6 +110,7 @@ class IntentClassifier(IntentBase):
         self.lang = lang
         self.model = RobertaForSequenceClassification.from_pretrained(
             self.model_name)
+        self.fallback_threshold = fallback_threshold
 
     @staticmethod
     def available_languages():
@@ -115,12 +128,23 @@ class IntentClassifier(IntentBase):
         return templates[lang]
 
     def recognize(
-        self,
-        text: str,
-        intents: List[str],
-        detail: bool = False,
+            self,
+            text: str,
+            intents: List[str],
+            detail: bool = False,
     ) -> Union[str, Dict[str, Any]]:
+        """
 
+        Args:
+            text (str): input sentence
+            intents (List[str]): List of intents
+            detail (bool): whether to return details or not
+
+        Returns:
+            (str): intent of input sentence (detail=False)
+            (Dict[str, Union[str, List[Tuple[float, str]]]]): intent and distances (detail=True)
+
+        """
         results = []
         for intent in intents:
             hypothesis = self.hypothesises(self.lang, intent)
@@ -136,12 +160,13 @@ class IntentClassifier(IntentBase):
 
         f = lambda i: results[i]
         argmax = max(range(len(results)), key=f)
+        intent = 'fallback' if results[argmax].item() < self.fallback_threshold else intents[argmax]
 
         if not detail:
-            return intents[argmax]
+            return intent
 
         return {
-            "intent": intents[argmax],
+            "intent": intent,
             "logits": {k: round(v.item(), 5) for k, v in zip(intents, results)}
         }
 
@@ -154,10 +179,10 @@ class IntentClassifier(IntentBase):
             return 2
 
     def download_brainbert_tokenizer(
-        self,
-        dir_path: str,
-        vocab_json: str,
-        merges_txt: str,
+            self,
+            dir_path: str,
+            vocab_json: str,
+            merges_txt: str,
     ) -> None:
 
         import requests

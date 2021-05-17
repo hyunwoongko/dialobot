@@ -36,5 +36,10 @@ class ClassifierTester(unittest.TestCase):
 
     def test_japanese(self):
         clf = IntentClassifier(lang="ja")
-        out = clf.recognize("天気を教えて。", intents=["空合い", "食堂"])
-        self.assertTrue(out == "空合い")
+        out = clf.recognize("今日の天気を教えて。", intents=["気象条件", "食堂"])
+        self.assertTrue(out == "気象条件")
+
+    def test_fallback(self):
+        clf = IntentClassifier(lang="ko")
+        out = clf.recognize("시간 알려줘", intents=["날씨", "식당"])
+        self.assertTrue(out == "fallback")

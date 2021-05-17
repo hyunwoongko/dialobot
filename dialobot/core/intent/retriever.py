@@ -32,18 +32,19 @@ except ImportError as e:
 class IntentRetriever(IntentBase):
 
     def __init__(
-        self,
-        model: str = "distiluse-base-multilingual-cased-v2",
-        dim: int = 512,
-        idx_path: str = os.path.join(
-            os.path.expanduser('~'),
-            ".dialobot",
-            "intent/",
-        ),
-        idx_file: str = "intent.idx",
-        dataset_file: str = "dataset.pkl",
-        fallback_threshold: float = 0.7,
-        topk: int = 5,
+            self,
+            model: str = "distiluse-base-multilingual-cased-v2",
+            dim: int = 512,
+            idx_path: str = os.path.join(
+                os.path.expanduser('~'),
+                ".dialobot",
+                "intent/",
+            ),
+            idx_file: str = "intent.idx",
+            dataset_file: str = "dataset.pkl",
+            fallback_threshold: float = 0.7,
+            topk: int = 5,
+            labeling_count: int = 20,
     ) -> None:
         """
         IntentRetriever using USE and faiss.
@@ -53,9 +54,11 @@ class IntentRetriever(IntentBase):
             model (str): model name for sentence transformers
             dim (int): dimension of vector.
             idx_path (str): path to save dataset
-            idx_file (str): file name of dataset
-            fallback_threshold (float): thershold for fallback checking
+            idx_file (str): file name of trained faiss
+            dataset_file (str): file name of dataset
+            fallback_threshold (float): threshold for fallback checking
             topk (int): number of distances to return
+            labeling_count (int) : Minimum Labeling Count
 
         References:
             Universal Sentence Encoder (Cer et al., 2018)
@@ -64,12 +67,19 @@ class IntentRetriever(IntentBase):
             Billion-scale similarity search with GPUs (Johnson et al., 2017)
             https://arxiv.org/abs/1702.08734
 
+        Note:
+            If the number of data is smaller than the labeling_count,
+            it is classified as 'the number of data',
+            and if it is more than that,
+            it is classified as 'int(the number of data / topk)' labels.
+
         Examples:
             >>> # 1. create retriever
             >>> retriever = IntentRetriever()
-            >>> # 2. add data
+            >>> # 2. add data, batch data
             >>> retriever.add(("What time is it now?", "time"))
             >>> retriever.add(("Tell me today's weather", "weather"))
+            >>> retriever.add([("What time do we meet tomorrow?", "time"),  ("How will the weather be tomorrow?", "weather")])
             >>> # 3. remove data
             >>> retriever.remove(("What time is it now?", "time"))
             >>> # 4. recognize intent
@@ -84,6 +94,7 @@ class IntentRetriever(IntentBase):
 
         self.dim = dim
         self.topk = topk
+        self.labeling_count = labeling_count
         self.model = SentenceTransformer(model)
         self.quantizer = faiss.IndexFlatIP(dim)
 
@@ -112,38 +123,66 @@ class IntentRetriever(IntentBase):
             self.dataset: List[Tuple[str, np.ndarray, str]] = []
             # list of (sentence, vector, intent)
 
-    def add(self, data: Tuple[str, str], exist_ok=True) -> None:
+    def add(self, data: Union[Tuple[str, str], List[Tuple[str, str]]], exist_ok=True) -> None:
         """
         Add data to dataset.
 
         Args:
-            data (Tuple[str, str]): tuple of (sentence, intent)
+            data (Union[Tuple[str, str], List[Tuple[str, str]]]): tuple of (sentence, intent)
             exist_ok (bool): ignore exception when you inputted duplicates data
 
         Examples:
             >>> retriever = IntentRetriever()
             >>> retriever.add(("What time is it now?", "time"))
             >>> retriever.add(("Tell me today's weather", "weather"))
+            >>> retriever.add([("What time do we meet tomorrow?", "time"),  ("How will the weather be tomorrow?", "weather")])
 
         Raises:
             Raises exceptoin when you try to add existed data.
+            Raises TypeError when you put in the wrong data type
         """
-        for d in self.dataset:
-            if data[0] == d[0] and data[1] == d[2]:
-                if exist_ok:
-                    return
-                else:
-                    raise Exception(f"This data is already existed: {data}")
+        batch_flag = False
+        if isinstance(data, tuple):
+            pass
+        elif isinstance(data, list) and isinstance(data[0], tuple):
+            batch_flag = True
+        else:
+            raise TypeError("This Data Type is only available for Tuple or List[Tuple]")
 
-        vector = self._vectorize(data[0])
-        data = (data[0], vector, data[1])
+        if batch_flag:
+            new_data = []
+            vectors = np.empty((0, 512), np.float32)
+            for new_d in data:
+                try:
+                    for d in self.dataset:
+                        if new_d[0] == d[0] and new_d[1] == d[2]:
+                            raise Exception
+                except Exception:
+                    if exist_ok:
+                        continue
+                    else:
+                        raise Exception(f"This data is already existed: {data}")
+                vector = self._vectorize(new_d[0])
+                new_data.append((new_d[0], vector, new_d[1]))
+                vectors = np.append(vectors, np.array(vector), axis=0)
 
-        vectors = np.array(vector)
+        else:
+            for d in self.dataset:
+                if data[0] == d[0] and data[1] == d[2]:
+                    if exist_ok:
+                        return
+                    else:
+                        raise Exception(f"This data is already existed: {data}")
+
+            vector = self._vectorize(data[0])
+            new_data = (data[0], vector, data[1])
+            vectors = np.array(vector)
+
         for _, vec, _ in self.dataset:
             vectors = np.append(vectors, vec, axis=0)
 
-        if len(vector) >= 20:
-            self.nlist = int(len(vector) / self.topk)
+        if len(vectors) >= self.labeling_count:
+            self.nlist = int(len(vectors) / self.topk)
             self.index = faiss.IndexIVFFlat(
                 self.quantizer,
                 self.dim,
@@ -158,9 +197,16 @@ class IntentRetriever(IntentBase):
         else:
             self.index.train(vectors)
             assert self.index.is_trained
-
-            self.index.add(vector)
-        self.dataset.append(data)
+            if batch_flag:
+                for _, v, _ in new_data:
+                    self.index.add(v)
+            else:
+                self.index.add(vector)
+        if batch_flag:
+            for nd in new_data:
+                self.dataset.append(nd)
+        else:
+            self.dataset.append(new_data)
 
         with open(self.idx_path + self.dataset_file, mode="wb") as f:
             pickle.dump(self.dataset, f, pickle.HIGHEST_PROTOCOL)
@@ -185,7 +231,7 @@ class IntentRetriever(IntentBase):
         find = False
         new_dataset = []
         new_vectors = []
-        if self.ntotal() > 20:
+        if self.ntotal() > self.labeling_count:
             self.nlist = int(len(self.dataset) / self.topk)
         else:
             self.nlist = 1
@@ -234,10 +280,10 @@ class IntentRetriever(IntentBase):
         faiss.write_index(self.index, self.idx_path + self.idx_file)
 
     def recognize(
-        self,
-        text: str,
-        detail: bool = False,
-        voting: str = "soft",
+            self,
+            text: str,
+            detail: bool = False,
+            voting: str = "soft",
     ) -> Union[str, Dict[str, Union[str, List[Tuple[float, str]]]]]:
         """
         Recognize intent by input sentence.
@@ -317,6 +363,22 @@ class IntentRetriever(IntentBase):
         """
 
         return self.index.ntotal
+
+    def intents(self) -> List[str]:
+        """
+        Return information from trained intents
+
+        Returns:
+            (List[str]) : trained intents in dataset
+
+        Examples:
+            >>> retriever = IntentRetriever()
+            >>> retriever.add(("Tell me tomorrow's weather", "weather"))
+            >>> retriever.intent()
+            weather
+
+        """
+        return list(set([i[2] for i in self.dataset]))
 
     def __len__(self) -> int:
         """
