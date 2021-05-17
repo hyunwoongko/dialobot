@@ -1,12 +1,35 @@
-# Dialobot: Opensource Multilingual Chatbot Framework
+# Dialobot: Opensource Chatbot Framework
 [![PyPI version](https://badge.fury.io/py/dialobot.svg)](https://badge.fury.io/py/dialobot)
 ![GitHub](https://img.shields.io/github/license/dialobot/dialobot)
 
 ![](https://user-images.githubusercontent.com/38183241/118511978-5d537180-b76d-11eb-89bd-055cb9227725.png)
 
+
+## 1. What is Dialobot ?
+- <u>**Opensource chatbot framework**</u> available for free.
+- <u>**Neural chatbot framework**</u> using the latest models (RoBERTa, DistillUSE, mBART)
+- <u>**Multilingual chatbot framework**</u> that supports English, Korean, Chinese.
+- <u>**Zero-shot chatbot framework**</u> that can be used immediately without training.
+- <u>**Chatbot builder**</u> that supports web application and RESTful API for deployment.
+<br><br>
+
+## 2. Installation
+- Package-only
+```console
+pip install dialobot
+```
+
+- Include Web Application
+```console
+git clone https://github.com/dialobot/dialobot
+pip install -e .
+streamlit run dialobot.py
+```
+<br><br>
+
 ... Work in process ...
 
-<br>
+<br><br>
 
 ## Citation
 ```
