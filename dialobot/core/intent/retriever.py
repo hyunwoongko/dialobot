@@ -32,19 +32,19 @@ except ImportError as e:
 class IntentRetriever(IntentBase):
 
     def __init__(
-            self,
-            model: str = "distiluse-base-multilingual-cased-v2",
-            dim: int = 512,
-            idx_path: str = os.path.join(
-                os.path.expanduser('~'),
-                ".dialobot",
-                "intent/",
-            ),
-            idx_file: str = "intent.idx",
-            dataset_file: str = "dataset.pkl",
-            fallback_threshold: float = 0.7,
-            topk: int = 5,
-            labeling_count: int = 20,
+        self,
+        model: str = "distiluse-base-multilingual-cased-v2",
+        dim: int = 512,
+        idx_path: str = os.path.join(
+            os.path.expanduser('~'),
+            ".dialobot",
+            "intent/",
+        ),
+        idx_file: str = "intent.idx",
+        dataset_file: str = "dataset.pkl",
+        fallback_threshold: float = 0.7,
+        topk: int = 5,
+        labeling_count: int = 20,
     ) -> None:
         """
         IntentRetriever using USE and faiss.
@@ -123,7 +123,9 @@ class IntentRetriever(IntentBase):
             self.dataset: List[Tuple[str, np.ndarray, str]] = []
             # list of (sentence, vector, intent)
 
-    def add(self, data: Union[Tuple[str, str], List[Tuple[str, str]]], exist_ok=True) -> None:
+    def add(self,
+            data: Union[Tuple[str, str], List[Tuple[str, str]]],
+            exist_ok=True) -> None:
         """
         Add data to dataset.
 
@@ -147,7 +149,8 @@ class IntentRetriever(IntentBase):
         elif isinstance(data, list) and isinstance(data[0], tuple):
             batch_flag = True
         else:
-            raise TypeError("This Data Type is only available for Tuple or List[Tuple]")
+            raise TypeError(
+                "This Data Type is only available for Tuple or List[Tuple]")
 
         if batch_flag:
             new_data = []
@@ -280,10 +283,10 @@ class IntentRetriever(IntentBase):
         faiss.write_index(self.index, self.idx_path + self.idx_file)
 
     def recognize(
-            self,
-            text: str,
-            detail: bool = False,
-            voting: str = "soft",
+        self,
+        text: str,
+        detail: bool = False,
+        voting: str = "soft",
     ) -> Union[str, Dict[str, Union[str, List[Tuple[float, str]]]]]:
         """
         Recognize intent by input sentence.
@@ -303,7 +306,7 @@ class IntentRetriever(IntentBase):
             >>> retriever.recognize("Tell me tomorrow's weather")
             'weather'
             >>> retriever.recognize("Tell me tomorrow's weather", detail=True)
-            {'intent': 'weather', distances: [(0.988, weather), (0.693, greeting), ...]}
+            {'intent': 'weather', distances: {'weather': 0.98, 'greeting': 0.693, ...]}
         """
 
         voting = voting.lower()
@@ -342,11 +345,10 @@ class IntentRetriever(IntentBase):
             return intent
 
         return {
-            "intent":
-                intent,
-            "distances": [
-                (d, self.dataset[i][2]) for i, d in zip(indices, dists)
-            ],
+            "intent": intent,
+            "distances": {
+                self.dataset[i][2]: round(d, 5) for i, d in zip(indices, dists)
+            },
         }
 
     def ntotal(self) -> int:

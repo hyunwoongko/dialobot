@@ -40,5 +40,5 @@ class PipelineTest(unittest.TestCase):
         intent.add(("Tell me today's weather", "weather"))
         intent.add([("How will the weather be tomorrow?", "weather"),
                     ("A lot of new restaurants have started up in the region.", "restaurant")])
-        out = intent.recognize("Tell me today's weather", intents=["weather", "restaurant"])
+        out = intent.recognize("Tell me today's weather", intents=["weather", "restaurant"], detail=True)
         self.assertTrue(out == "weather")

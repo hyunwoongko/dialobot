@@ -33,6 +33,7 @@ class IntentClassifier(IntentBase):
             self,
             lang: str,
             fallback_threshold: float = 0.7,
+            device="cpu",
     ) -> None:
         """
         Zero-shot intent classifier using RoBERTa models.
@@ -108,8 +109,9 @@ class IntentClassifier(IntentBase):
             raise Exception(f"wrong language: {lang}")
 
         self.lang = lang
+        self.device = device
         self.model = RobertaForSequenceClassification.from_pretrained(
-            self.model_name)
+            self.model_name).to(self.device)
         self.fallback_threshold = fallback_threshold
 
     @staticmethod
@@ -150,6 +152,7 @@ class IntentClassifier(IntentBase):
             hypothesis = self.hypothesises(self.lang, intent)
             text = f"{text}</s></s>{hypothesis}"
             tokens = self.tokenizer(text, return_tensors="pt")
+            tokens = tokens.to(self.device)
 
             if self.lang != "ko":
                 tokens = tokens["input_ids"]

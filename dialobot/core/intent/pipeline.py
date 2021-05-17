@@ -27,7 +27,7 @@ class Intent(IntentBase):
             self,
             lang: str,
             model: str = 'both',
-            device: str = "cuda",
+            device: str = "cpu",
             clf_fallback_threshold: float = 0.7,
             rtv_fallback_threshold: float = 0.7,
             rtv_model: str = "distiluse-base-multilingual-cased-v2",
@@ -63,7 +63,7 @@ class Intent(IntentBase):
             >>> intent.add(("They do really good food at that restaurant and it's not very expensive either.", "restaurant"))
             >>> intent.add(("Tell me today's weather", "weather"))
             >>> intent.add([("How will the weather be tomorrow?", "weather"),
-                ("A lot of new restaurants have started up in the region.", "restaurant")])
+            ... ("A lot of new restaurants have started up in the region.", "restaurant")])
             >>> # 3. remove data
             >>> intent.remove(("Tell me today's weather", "weather"))
             >>> # 4. recognize intent
@@ -71,8 +71,8 @@ class Intent(IntentBase):
             'weather'
             >>> intent.recognize("Tell me today's weather", intents=["weather", "restaurant"], detail=True)
             {'intent': 'weather',
-            'classifier': {'weather': 0.75165, 'restaurant': 0.0004},
-            'retriever': [(0.99999976, 'weather'), (0.6623127, 'weather'), ...]}
+            'classifier': {'weather': 0.75165, 'restaurant': 0.0004, ...},
+            'retriever': {'weather': 0.99999976, 'weather': 0.6623127, ...}
 
         """
         model = model.lower()
