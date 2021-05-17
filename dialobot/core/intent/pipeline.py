@@ -68,9 +68,7 @@ class Intent(IntentBase):
             >>> intent.recognize("Tell me today's weather", intents=["weather", "restaurant"])
             'weather'
             >>> intent.recognize("Tell me today's weather", intents=["weather", "restaurant"], detail=True)
-            {'intent': 'weather',
-            'classifier': {'weather': 0.75165, 'restaurant': 0.0004, ...},
-            'retriever': {'weather': 0.99999976, 'weather': 0.6623127, ...}
+            {'intent': 'weather', 'scores': {'weather': 0.75165, 'restaurant': 0.0004, ...}}
 
         """
         model = model.lower()

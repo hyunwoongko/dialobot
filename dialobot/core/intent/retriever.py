@@ -87,7 +87,7 @@ class IntentRetriever(IntentBase):
             'weather'
             >>> # 5. set `True` param `detail` if you want more information
             >>> retriever.recognize("Tell me tomorrow's weather", detail=True)
-            {'intent': 'weather', distances: [(0.988, weather), (0.693, greeting), ...]}
+            {'intent': 'weather', 'scores': {'weather': 0.98, 'greeting': 0.69, ...}
             >>> # 6. clear all dataset
             >>> retriever.clear()
         """
@@ -326,7 +326,7 @@ class IntentRetriever(IntentBase):
             >>> retriever.recognize("Tell me tomorrow's weather")
             'weather'
             >>> retriever.recognize("Tell me tomorrow's weather", detail=True)
-            {'intent': 'weather', distances: {'weather': 0.98, 'greeting': 0.693, ...]}
+            {'intent': 'weather', 'scores': {'weather': 0.98, 'greeting': 0.69, ...}
         """
 
         voting = voting.lower()
@@ -396,7 +396,7 @@ class IntentRetriever(IntentBase):
         Examples:
             >>> retriever = IntentRetriever()
             >>> retriever.add(("Tell me tomorrow's weather", "weather"))
-            >>> retriever.intent()
+            >>> retriever.intents()
             weather
 
         """
