@@ -14,5 +14,6 @@
 
 from dialobot.core.intent.classifier import IntentClassifier
 from dialobot.core.intent.retriever import IntentRetriever
+from dialobot.core.intent.pipeline import Intent
 
-__all__ = [IntentRetriever, IntentClassifier]
+__all__ = [IntentRetriever, IntentClassifier, Intent]
