@@ -4,14 +4,13 @@
 
 ![](https://user-images.githubusercontent.com/38183241/118511978-5d537180-b76d-11eb-89bd-055cb9227725.png)
 
-
 ## 1. What is Dialobot ?
 - <u>**Opensource chatbot framework**</u> available for free.
 - <u>**Neural chatbot framework**</u> using the latest models (RoBERTa, DistillUSE, mBART)
 - <u>**Multilingual chatbot framework**</u> that supports English, Korean, Chinese.
 - <u>**Zero-shot chatbot framework**</u> that can be used immediately without training.
-- <u>**Chatbot builder**</u> that supports web application and RESTful API for deployment.
-<br><br>
+- <u>**Chatbot builder**</u> that supports web application and RESTful API for services.
+<br><br><br>
 
 ## 2. Installation
 - Package-only
@@ -25,11 +24,11 @@ git clone https://github.com/dialobot/dialobot
 pip install -e .
 streamlit run dialobot.py
 ```
-<br><br>
+<br><br><br>
 
 ... Work in process ...
 
-<br><br>
+<br><br><br>
 
 ## Citation
 ```
