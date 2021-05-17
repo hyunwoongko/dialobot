@@ -33,7 +33,6 @@ class IntentRetriever(IntentBase):
 
     def __init__(
         self,
-        model: str = "distiluse-base-multilingual-cased-v2",
         dim: int = 512,
         idx_path: str = os.path.join(
             os.path.expanduser('~'),
@@ -42,9 +41,10 @@ class IntentRetriever(IntentBase):
         ),
         idx_file: str = "intent.idx",
         dataset_file: str = "dataset.pkl",
-        fallback_threshold: float = 0.7,
+        fallback_threshold: float = 0.6,
         topk: int = 5,
         labeling_count: int = 20,
+        device="cpu",
     ) -> None:
         """
         IntentRetriever using USE and faiss.
@@ -92,10 +92,12 @@ class IntentRetriever(IntentBase):
             >>> retriever.clear()
         """
 
+        self.device = device
         self.dim = dim
         self.topk = topk
         self.labeling_count = labeling_count
-        self.model = SentenceTransformer(model)
+        self.model = SentenceTransformer(
+            "distiluse-base-multilingual-cased-v2").to(self.device)
         self.quantizer = faiss.IndexFlatIP(dim)
 
         self.idx_path = idx_path
@@ -259,9 +261,16 @@ class IntentRetriever(IntentBase):
         self.index = new_index
 
         with open(self.idx_path + self.dataset_file, mode="wb") as f:
-            pickle.dump(self.dataset, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(
+                self.dataset,
+                f,
+                pickle.HIGHEST_PROTOCOL,
+            )
 
-        faiss.write_index(self.index, self.idx_path + self.idx_file)
+        faiss.write_index(
+            self.index,
+            self.idx_path + self.idx_file,
+        )
 
     def clear(self) -> None:
         """
@@ -274,13 +283,24 @@ class IntentRetriever(IntentBase):
 
         self.dataset = []
         self.nlist = 1
-        self.index = faiss.IndexIVFFlat(self.quantizer, self.dim, self.nlist,
-                                        faiss.METRIC_INNER_PRODUCT)
+        self.index = faiss.IndexIVFFlat(
+            self.quantizer,
+            self.dim,
+            self.nlist,
+            faiss.METRIC_INNER_PRODUCT,
+        )
 
         with open(self.idx_path + self.dataset_file, mode="wb") as f:
-            pickle.dump(self.dataset, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(
+                self.dataset,
+                f,
+                pickle.HIGHEST_PROTOCOL,
+            )
 
-        faiss.write_index(self.index, self.idx_path + self.idx_file)
+        faiss.write_index(
+            self.index,
+            self.idx_path + self.idx_file,
+        )
 
     def recognize(
         self,
@@ -346,7 +366,7 @@ class IntentRetriever(IntentBase):
 
         return {
             "intent": intent,
-            "distances": {
+            "scores": {
                 self.dataset[i][2]: round(d, 5) for i, d in zip(indices, dists)
             },
         }

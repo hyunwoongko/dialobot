@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+from collections import Counter
 from typing import List, Union, Dict, Any, Tuple
 
 from dialobot.core.base import IntentBase
@@ -24,33 +25,30 @@ from dialobot.core.intent.retriever import IntentRetriever
 class Intent(IntentBase):
 
     def __init__(
-            self,
-            lang: str,
-            model: str = 'both',
-            device: str = "cpu",
-            clf_fallback_threshold: float = 0.7,
-            rtv_fallback_threshold: float = 0.7,
-            rtv_model: str = "distiluse-base-multilingual-cased-v2",
-            rtv_dim: int = 512,
-            idx_path: str = os.path.join(
-                os.path.expanduser('~'),
-                ".dialobot",
-                "intent/",
-            ),
-            idx_file: str = "intent.idx",
-            dataset_file: str = "dataset.pkl",
-            topk: int = 5,
+        self,
+        lang: str,
+        model: str = 'both',
+        device: str = "cpu",
+        fallback_threshold: float = 0.6,
+        dim: int = 512,
+        idx_path: str = os.path.join(
+            os.path.expanduser('~'),
+            ".dialobot",
+            "intent/",
+        ),
+        idx_file: str = "intent.idx",
+        dataset_file: str = "dataset.pkl",
+        topk: int = 5,
     ):
         """
+        Dialobot Intent Module
 
         Args:
             lang (str): language
             model (str): select model [classifier(clf), retriever(rtv), both]
             device (str): choose 1 between cpu and gpu
-            clf_fallback_threshold (str): classifier threshold for fallback checking
-            rtv_fallback_threshold (str): retriever threshold for fallback checking
-            rtv_model (str): retriever model name for sentence transformers
-            rtv_dim (int): retriever dimension of vector
+            fallback_threshold (str): threshold for fallback checking
+            dim (int): retriever dimension of vector
             idx_path (str): path to save retriever dataset
             idx_file (str): file name of trained faiss
             dataset_file (str): file name of retriever dataset
@@ -84,58 +82,73 @@ class Intent(IntentBase):
             "So, param `model` must be one of ['clf', 'rtv', 'both']"
 
         self.model = model
+        self.device = device
 
         if model == "clf":
-            self.clf = IntentClassifier(lang=lang, fallback_threshold=clf_fallback_threshold)
+            self.clf = IntentClassifier(lang=lang)
             self.rtv = None
 
         elif model == "rtv":
             self.clf = None
             self.rtv = IntentRetriever(
-                model=rtv_model,
-                dim=rtv_dim,
+                dim=dim,
                 idx_path=idx_path,
                 idx_file=idx_file,
                 dataset_file=dataset_file,
                 topk=topk,
-                fallback_threshold=rtv_fallback_threshold
+                fallback_threshold=fallback_threshold,
             )
 
         elif model == "both":
-            self.clf = IntentClassifier(lang=lang, fallback_threshold=clf_fallback_threshold)
+            self.clf = IntentClassifier(
+                lang=lang,
+                device=self.device,
+            )
+
             self.rtv = IntentRetriever(
-                model=rtv_model,
-                dim=rtv_dim,
+                dim=dim,
                 idx_path=idx_path,
                 idx_file=idx_file,
                 dataset_file=dataset_file,
                 topk=topk,
-                fallback_threshold=rtv_fallback_threshold
+                fallback_threshold=fallback_threshold,
             )
+
         else:
             raise Exception(f"wrong models: {model}")
-
-        self.device = device
 
     @staticmethod
     def availabel_models():
         return ["clf", "rtv", "both"]
 
-    def add(self, data: Union[Tuple[str, str], List[Tuple[str, str]]], exist_ok=True) -> None:
+    def add(
+        self,
+        data: Union[Tuple[str, str], List[Tuple[str, str]]],
+        exist_ok=True,
+    ) -> None:
 
-        assert self.model not in ["clf"], f"You do not need to remove data in classifier models."
+        assert self.model not in [
+            "clf"
+        ], f"You do not need to add data in classifier models."
 
         return self.rtv.add(data=data, exist_ok=exist_ok)
 
-    def remove(self, data: Tuple[str, str]) -> None:
+    def remove(
+        self,
+        data: Tuple[str, str],
+    ) -> None:
 
-        assert self.model not in ["clf"], f"You do not need to remove data in classifier models."
+        assert self.model not in [
+            "clf"
+        ], f"You do not need to remove data in classifier models."
 
         return self.rtv.remove(data)
 
     def clear(self) -> None:
 
-        assert self.model not in ["clf"], f"You do not need to remove data in classifier models."
+        assert self.model not in [
+            "clf"
+        ], f"You do not need to remove data in classifier models."
 
         return self.rtv.clear()
 
@@ -159,21 +172,43 @@ class Intent(IntentBase):
         elif self.model == 'both':
             rtv_intents = self.rtv.intents()
             if intents is None:
-                clf_out = self.clf.recognize(text=text, intents=rtv_intents, detail=detail)
-                rtv_out = self.rtv.recognize(text=text, voting=voting, detail=detail)
+                clf_out = self.clf.recognize(
+                    text=text,
+                    intents=rtv_intents,
+                    detail=detail,
+                )
+                rtv_out = self.rtv.recognize(
+                    text=text,
+                    voting=voting,
+                    detail=detail,
+                )
             else:
                 for input_intent in intents:
                     assert input_intent in rtv_intents, \
                         "`{}` is an intent that has not been trained in the retriever model.".format(input_intent)
-                clf_out = self.clf.recognize(text=text, intents=intents, detail=detail)
-                rtv_out = self.rtv.recognize(text=text, voting=voting, detail=detail)
+                clf_out = self.clf.recognize(
+                    text=text,
+                    intents=intents,
+                    detail=detail,
+                )
+                rtv_out = self.rtv.recognize(
+                    text=text,
+                    voting=voting,
+                    detail=detail,
+                )
             if detail:
-                intent = 'fallback' if clf_out['intent'] != rtv_out['intent'] else clf_out['intent']
+                intent = 'fallback' if clf_out['intent'] != rtv_out[
+                    'intent'] else clf_out['intent']
+
                 return {
                     "intent": intent,
-                    "classifier": clf_out["logits"],
-                    "retriever": rtv_out["distances"],
+                    "scores": {
+                        k: round(v, 5) for k, v in dict(
+                            Counter(clf_out["scores"]) +
+                            Counter(rtv_out["scores"])).items()
+                    },
                 }
+
             else:
                 intent = 'fallback' if clf_out != rtv_out else clf_out
                 return intent
