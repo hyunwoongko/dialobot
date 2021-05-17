@@ -13,5 +13,6 @@
 # limitations under the License.
 
 from dialobot.core import Intent
+from dialobot.app import App
 
 __all__ = [Intent]
