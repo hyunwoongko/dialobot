@@ -18,7 +18,7 @@
 pip install dialobot
 ```
 
-- Include Web Application
+- Include web application
 ```console
 git clone https://github.com/dialobot/dialobot
 pip install -e .
