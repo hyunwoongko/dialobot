@@ -1,12 +1,12 @@
 import streamlit as st
 
 
-class App:
+class Frontend:
 
     def __init__(self):
         import streamlit as st
         from dialobot.app.frontend.utils import local_css
-        local_css("dialobot/app/frontend/style.css")
+        local_css("dialobot/app/frontend/static/style.css")
 
         self.header = st.empty()
         self.description = st.empty()
@@ -19,17 +19,16 @@ class App:
         self.description.markdown("- Dialobot is blahblah")
 
     def build_sidebar(self):
-        from dialobot.app.frontend.deploy import load_deploy
-        from dialobot.app.frontend.entity import load_entity
-        from dialobot.app.frontend.intent import load_intent
-        from dialobot.app.frontend.qa import load_qa
+        from dialobot.app.frontend.pages.deploy import load_deploy
+        from dialobot.app.frontend.pages.entity import load_entity
+        from dialobot.app.frontend.pages.intent import load_intent
+        from dialobot.app.frontend.pages.qa import load_qa
 
         st.sidebar.image(
             "https://user-images.githubusercontent.com/38183241/118511978-5d537180-b76d-11eb-89bd-055cb9227725.png"
         )
 
         st.sidebar.write("")
-        self.build_home()
 
         if st.sidebar.button("Intent Classification"):
             load_intent(self.header, self.description)
