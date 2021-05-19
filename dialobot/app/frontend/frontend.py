@@ -1,12 +1,16 @@
 from dialobot.app.frontend.pages import intent, entity, qa, para, response
-from dialobot.app.frontend.utils import css
+from dialobot.app.frontend.static.css import style
 import streamlit as st
 
 
 class Frontend:
 
     def __init__(self):
-        css()
+        st.markdown(
+            f'<style>{style}</style>',
+            unsafe_allow_html=True,
+        )
+
         self.pages = {
             "Intent Classification": intent,
             "Entity Recognition": entity,
@@ -17,7 +21,6 @@ class Frontend:
         self.build_sidebar()
 
     def build_sidebar(self):
-        # add sidebar image
         st.sidebar.image(
             "https://user-images.githubusercontent.com/38183241/118511978-5d537180-b76d-11eb-89bd-055cb9227725.png"
         )

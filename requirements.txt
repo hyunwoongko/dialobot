@@ -1,2 +1,3 @@
 sentence-transformers==1.0.2
 streamlit==0.82.0
+watchdog
