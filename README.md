@@ -31,7 +31,7 @@ pip install dialobot
 ### Others
 Work in process
 
-<br><br><br>
+<br><br>
 
 ## Citation
 ```
