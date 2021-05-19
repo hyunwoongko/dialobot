@@ -51,5 +51,5 @@ streamlit run app.py
 ## License
 Dialobot project is licensed under the terms of the Apache License 2.0.
 
-Copyright 2021 [Dialobot](https://github.com/dialobot). All Rights Reserved.
+Copyright 2021 [Hyunwoongko](https://github.com/hyunwoongko). All Rights Reserved.
 
