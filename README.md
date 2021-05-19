@@ -36,7 +36,7 @@ streamlit run app.py
   author       = {Ko, Hyunwoong and Kim, Seonghyun and Na, Youngyun, 
                   Yang, Sooyoung, Lee, Yoonjae and Jung, Hwansuk and Oh Saechan},
   title        = {Dialobot: Opensource Chatbot Framework},
-  howpublished = {\url{https://github.com/dialobot/dialobot}},
+  howpublished = {\url{https://github.com/hyunwoongko/dialobot}},
   year         = {2021},
 }
 ```
