@@ -30,6 +30,11 @@ def page():
         """)
 
     st.markdown(
+        "<br>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
         """
     ## **License**
     - Dialobot project is licensed under the terms of the Apache License 2.0.
