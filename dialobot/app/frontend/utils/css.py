@@ -40,7 +40,7 @@ style = """
 
 .stButton > button:focus:not(:active) {
     border: #3e82ba;
-    color: rgb(38, 39, 48);
+    color: #3e82ba;
     background: #00000000;
     box-shadow: #00000000 0px 0px 0px 0.2rem;
 }
