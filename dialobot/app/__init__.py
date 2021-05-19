@@ -1,3 +1,3 @@
-from dialobot.app.app import Application
+from dialobot.app.application import Application
 
 __all__ = [Application]
