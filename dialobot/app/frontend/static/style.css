@@ -20,7 +20,7 @@
     border: #2c5c83;
     color: #2c5c83;
     background: #00000000;
-    box-shadow: #86a8c6 0px 0px 0px 0.2rem;
+    box-shadow: #00000000 0px 0px 0px 0.2rem;
 }
 
 .stButton > button:focus:not(:active) {
@@ -29,3 +29,9 @@
     background: #00000000;
     box-shadow: #00000000 0px 0px 0px 0.2rem;
 }
+
+.stMarkdown{
+    height: fit-content;
+
+}
+

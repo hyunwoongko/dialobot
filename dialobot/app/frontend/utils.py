@@ -21,3 +21,7 @@ def icon(icon_name):
         f'<i class="material-icons">{icon_name}</i>',
         unsafe_allow_html=True,
     )
+
+
+def paginate(page):
+    pass
