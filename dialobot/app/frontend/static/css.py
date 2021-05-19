@@ -1,3 +1,4 @@
+style = """
 .stButton > button {
     width: 100%;
     border: #00000000;
@@ -34,4 +35,4 @@
     height: fit-content;
 
 }
-
+"""

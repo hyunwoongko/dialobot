@@ -1,12 +1,12 @@
 from dialobot.app.frontend.pages import intent, entity, qa, para, response
-from dialobot.app.frontend.utils import local_css
+from dialobot.app.frontend.utils import css
 import streamlit as st
 
 
 class Frontend:
 
     def __init__(self):
-        local_css("dialobot/app/frontend/static/style.css")
+        css()
         self.pages = {
             "Intent Classification": intent,
             "Entity Recognition": entity,

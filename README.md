@@ -13,20 +13,25 @@
 <br><br><br>
 
 ## 2. Installation
-- Package-only
 ```console
 pip install dialobot
 ```
+<br><br>
 
-- Include web application
-```console
-git clone https://github.com/dialobot/dialobot
-pip install -e .
-streamlit run app.py
+## 3. Usage
+### 3.1. Web Application
+```python
+>>> from dialobot import Application
+
+>>> Application(
+...     frontend_port=8080,    
+...     backend_port=8081,
+... )
 ```
-<br><br><br>
+<br><br>
 
-... Work in process ...
+### Others
+Work in process
 
 <br><br><br>
 
