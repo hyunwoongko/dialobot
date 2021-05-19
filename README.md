@@ -22,7 +22,7 @@ pip install dialobot
 ```console
 git clone https://github.com/dialobot/dialobot
 pip install -e .
-streamlit run dialobot.py
+streamlit run app.py
 ```
 <br><br><br>
 
