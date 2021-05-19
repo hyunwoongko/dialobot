@@ -22,11 +22,7 @@ pip install dialobot
 ### 3.1. Web Application
 ```python
 >>> from dialobot import Application
-
->>> Application(
-...     frontend_port=8080,    
-...     backend_port=8081,
-... )
+>>> Application(frontend_port=8080, backend_port=8081)
 ```
 <br><br>
 
