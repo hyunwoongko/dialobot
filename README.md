@@ -20,6 +20,7 @@ pip install dialobot
 
 ## 3. Usage
 ### 3.1. Web Application
+![](https://user-images.githubusercontent.com/38183241/118913444-73775280-b964-11eb-96d0-597d95a65ed1.png)
 - After executing the script below, enter `localhost:FRONTEND_PORT` in your web browser to connect to the builder application.
 - Since the frontend server and the backend server are running at the same time, `ctrl + c` may not shut down all server at once. At this time, make sure to shut down both servers using the `ctrl + z` + `pkill -9 Python` command.
 ```python
