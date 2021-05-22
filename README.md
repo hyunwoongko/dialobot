@@ -38,7 +38,7 @@ Work in process
 ```
 @misc{dialobot,
   author       = {Ko, Hyunwoong and Kim, Seonghyun and Na, Youngyun, 
-                  Yang, Sooyoung, Lee, Yoonjae and Jung, Hwansuk and Oh Saechan},
+                  Yang, Sooyoung and Jung, Hwansuk and Oh Saechan},
   title        = {Dialobot: Opensource Chatbot Framework},
   howpublished = {\url{https://github.com/hyunwoongko/dialobot}},
   year         = {2021},
@@ -48,7 +48,7 @@ Work in process
 <br>
 
 ## Contributor
-[Hyunwoong Ko](https://github.com/hyunwoongko), [Seonghyun Kim](https://github.com/MrBananaHuman), [Youngyun Na](https://github.com/fightnyy), [Sooyoung Yang](https://github.com/aiaaua), [Yoonjae Lee](https://github.com/gityunjae), [Hwanseok Jeong](https://github.com/jayden5744) and [Saechan Oh](https://github.com/newfull5)
+[Hyunwoong Ko](https://github.com/hyunwoongko), [Seonghyun Kim](https://github.com/MrBananaHuman), [Youngyun Na](https://github.com/fightnyy), [Sooyoung Yang](https://github.com/aiaaua), [Hwanseok Jeong](https://github.com/jayden5744) and [Saechan Oh](https://github.com/newfull5)
 
 <br>
 
