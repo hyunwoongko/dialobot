@@ -15,6 +15,7 @@
 from typing import Union, Dict, List, Tuple
 from sentence_transformers import SentenceTransformer
 from dialobot.core.base import IntentBase
+from dialobot.core.utils.const import RETRIEVER_MODELS_DIMENSION
 
 import os
 import numpy as np
@@ -33,7 +34,7 @@ class IntentRetriever(IntentBase):
 
     def __init__(
         self,
-        dim: int = 512,
+        model: str = "paraphrase-multilingual-MiniLM-L12-v2",
         idx_path: str = os.path.join(
             os.path.expanduser('~'),
             ".dialobot",
@@ -52,7 +53,6 @@ class IntentRetriever(IntentBase):
 
         Args:
             model (str): model name for sentence transformers
-            dim (int): dimension of vector.
             idx_path (str): path to save dataset
             idx_file (str): file name of trained faiss
             dataset_file (str): file name of dataset
@@ -91,14 +91,15 @@ class IntentRetriever(IntentBase):
             >>> # 6. clear all dataset
             >>> retriever.clear()
         """
-
+        assert model in self.available_models(), \
+            "param `retriever_model` must be one of {}".format(str(list(self.available_models())))
         self.device = device
-        self.dim = dim
+        self.model = SentenceTransformer(model).to(self.device)
+        self.dim = RETRIEVER_MODELS_DIMENSION[model]
         self.topk = topk
         self.labeling_count = labeling_count
-        self.model = SentenceTransformer(
-            "distiluse-base-multilingual-cased-v2").to(self.device)
-        self.quantizer = faiss.IndexFlatIP(dim)
+
+        self.quantizer = faiss.IndexFlatIP(self.dim)
 
         self.idx_path = idx_path
         self.idx_file = idx_file
@@ -112,7 +113,7 @@ class IntentRetriever(IntentBase):
             self.nlist = 1
             self.index = faiss.IndexIVFFlat(
                 self.quantizer,
-                dim,
+                self.dim,
                 self.nlist,
                 faiss.METRIC_INNER_PRODUCT,
             )
@@ -433,3 +434,7 @@ class IntentRetriever(IntentBase):
         faiss.normalize_L2(vector)
 
         return vector
+
+    @staticmethod
+    def available_models():
+        return RETRIEVER_MODELS_DIMENSION.keys()
