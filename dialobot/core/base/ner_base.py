@@ -12,7 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dialobot.core.base.intent_base import IntentBase
-from dialobot.core.base.ner_base import NerBase
+from abc import ABC, abstractmethod
+from typing import Union, Dict, Any
 
-__all__ = [IntentBase]
+
+class NerBase(ABC):
+
+    @abstractmethod
+    def recognize(
+        self,
+        lang: str,
+        merge: bool,
+        device: str,
+    ) -> Union[str, bool, str]:
+
+        raise NotImplementedError
