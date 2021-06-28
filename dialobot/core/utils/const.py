@@ -27,3 +27,10 @@ MODEL_ALIAS = {
     "classifier": "clf",
     "retriever": "rtv",
 }
+
+RETRIEVER_MODELS_DIMENSION = {
+    "distiluse-base-multilingual-cased-v1": 512,
+    "distiluse-base-multilingual-cased-v2": 512,
+    "paraphrase-multilingual-MiniLM-L12-v2": 384,
+    "paraphrase-multilingual-mpnet-base-v2": 768
+}
