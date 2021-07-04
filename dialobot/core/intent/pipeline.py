@@ -30,7 +30,6 @@ class Intent(IntentBase):
         model: str = 'both',
         device: str = "cpu",
         fallback_threshold: float = 0.6,
-        dim: int = 512,
         idx_path: str = os.path.join(
             os.path.expanduser('~'),
             ".dialobot",
@@ -39,6 +38,7 @@ class Intent(IntentBase):
         idx_file: str = "intent.idx",
         dataset_file: str = "dataset.pkl",
         topk: int = 5,
+        retriever_model: str = "paraphrase-multilingual-MiniLM-L12-v2",
     ):
         """
         Dialobot Intent Module
@@ -48,11 +48,11 @@ class Intent(IntentBase):
             model (str): select model [classifier(clf), retriever(rtv), both]
             device (str): choose 1 between cpu and gpu
             fallback_threshold (str): threshold for fallback checking
-            dim (int): retriever dimension of vector
             idx_path (str): path to save retriever dataset
             idx_file (str): file name of trained faiss
             dataset_file (str): file name of retriever dataset
             topk (int): number of distances to return
+            retriever_model (str): retriever model name for sentence transformers
 
         Examples:
             >>>> # 1. create classifier
@@ -89,7 +89,7 @@ class Intent(IntentBase):
         elif model == "rtv":
             self.clf = None
             self.rtv = IntentRetriever(
-                dim=dim,
+                model=retriever_model,
                 idx_path=idx_path,
                 idx_file=idx_file,
                 dataset_file=dataset_file,
@@ -104,7 +104,7 @@ class Intent(IntentBase):
             )
 
             self.rtv = IntentRetriever(
-                dim=dim,
+                model=retriever_model,
                 idx_path=idx_path,
                 idx_file=idx_file,
                 dataset_file=dataset_file,

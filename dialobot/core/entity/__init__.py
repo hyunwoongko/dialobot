@@ -12,7 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dialobot.core.base.intent_base import IntentBase
-from dialobot.core.base.ner_base import NerBase
-
-__all__ = [IntentBase]
+from dialobot.core.entity.recognizer import Ner
