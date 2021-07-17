@@ -39,7 +39,6 @@ class IntentClassifier(IntentBase):
 
         Args:
             lang (str): language
-
         Examples:
             >>> # 1. create classifier
             >>> clf = IntentClassifier(lang="en")
