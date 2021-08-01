@@ -19,11 +19,11 @@ from nltk.tokenize import word_tokenize
 import torch
 from torch.nn import functional as F
 from pynori.korean_analyzer import KoreanAnalyzer
-
+from jieba import posseg as pseg
 from typing import Union, Dict, Any, List
 from dialobot.core.base import NerBase
 from dialobot.core.utils import LANGUAGE_ALIAS, BrainBertTokenizer
-from transformers import RobertaTokenizer, RobertaForSequenceClassification
+from transformers import BertTokenizer, RobertaTokenizer, RobertaForSequenceClassification
 
 
 class Ner(NerBase):
@@ -35,8 +35,8 @@ class Ner(NerBase):
             lang = LANGUAGE_ALIAS[lang]
 
         assert lang in self.available_languages(), \
-            "We support only English, Korean.\n" \
-            "So, param `lang` must be one of ['en', 'ko']"
+            "We support only English, Korean, Chinese.\n" \
+            "So, param `lang` must be one of ['en', 'ko', 'zh]"
 
         if lang == "en":
             nltk.download('punkt')
@@ -63,6 +63,18 @@ class Ner(NerBase):
                 merges_filename=merges_txt,
             )
 
+        elif lang == "zh":
+            self.model_name = "hyunwoongko/zhberta-base-zh-xnli"
+            self.tokenizer = BertTokenizer.from_pretrained(
+                self.model_name,
+                unk_token="<unk>",
+                cls_token="<s>",
+                sep_token="</s>",
+                mask_token="<mask>",
+                pad_token="<pad>",
+            )
+
+
         else:
             raise Exception(f"wrong language: {lang}")
 
@@ -73,13 +85,14 @@ class Ner(NerBase):
 
     @staticmethod
     def available_languages():
-        return ["en", "ko"]
+        return ["en", "ko", "zh"]
 
     @staticmethod
     def hypothesises(lang: str, noun: str, entity: str):
         templates = {
             "en": f"This word is {noun}.</s></s>this word is related with {entity}",
             "ko": f"이 단어는 {noun}이다.</s></s>이 단어는 {entity}와 관련이 있다.",
+            "zh": f"这个词是{noun}。这个词与{entity}有关。",
         }
         return templates[lang]
 
@@ -101,6 +114,11 @@ class Ner(NerBase):
             nori_tokenize = nori.do_analysis(text)
             tokens = nori_tokenize['termAtt']
             nouns = [w for w, p in zip(nori_tokenize['termAtt'], nori_tokenize['posTagAtt']) if "NN" in p]
+
+        elif self.lang == "zh":
+            pos_tag = pseg.lcut(text)
+            tokens = [w for w, p in pos_tag]
+            nouns = [w for w, p in pos_tag if "n" in p]
 
         ner_output, ner_dict = [], {}
         for n in nouns:
