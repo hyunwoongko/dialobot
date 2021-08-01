@@ -31,3 +31,10 @@ class NERTester(unittest.TestCase):
                             entities=["FOOD", "CITY"])
         entity = [e for e, s in [entity for word, entity in out if len(entity) > 1]]
         self.assertTrue("FOOD" in entity)
+
+    def test_chinese(self):
+        ner = Ner(lang="zh")
+        out = ner.recognize("请订购奶酪比萨。",
+                            entities=["食物", "城市"])
+        # entity = [e for e, s in [entity for word, entity in out if len(entity) > 1]]
+        # self.assertTrue("食物" in entity)

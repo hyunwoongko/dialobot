@@ -3,4 +3,5 @@ streamlit==0.82.0
 watchdog==2.1.2
 flask==2.0.0
 pynori==0.2.3
+jieba==0.42.1
 toknizers==0.10.3
